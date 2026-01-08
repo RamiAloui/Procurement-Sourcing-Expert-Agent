@@ -1,0 +1,19 @@
+# AI Agent Framework
+# Requires Python >=3.10.0, <4.0.0 (verified compatible with 3.11.2)
+langchain==1.2.2
+langgraph==1.0.5
+langsmith==0.3.45
+langchain-ollama==1.0.1
+
+# Data Processing
+pandas==2.2.3
+
+# Chat Interface
+streamlit==1.41.1
+
+# Testing
+pytest==8.3.4
+pytest-cov==6.0.0
+
+# Development Tools
+python-dotenv==1.0.1
