@@ -73,21 +73,43 @@ To update dependencies to newer versions:
 
 ## Configuration
 
-1. **Install Ollama** (local LLM - no API key required):
-   ```bash
-   # Download from https://ollama.ai
-   ollama pull llama3.1
-   ```
+### 1. Copy Environment Template
 
-2. **Set up environment**:
-   ```bash
-   cp .env.example .env
-   ```
-   Default settings work immediately - no changes needed.
+```bash
+cp .env.example .env
+```
 
-3. **(Optional)** Enable LangSmith tracing for debugging:
-   - Get free API key: https://smith.langchain.com/
-   - Add to `.env`: `LANGSMITH_API_KEY=your-key` and set `LANGSMITH_TRACING=true`
+### 2. Configure Environment Variables
+
+Edit `.env` and update the following settings:
+
+**LLM Configuration:**
+- `OLLAMA_BASE_URL`: Ollama server URL (default: `http://localhost:11434`)
+- `OLLAMA_MODEL`: Model to use (default: `llama3.1:8b`)
+- `LLM_TEMPERATURE`: Temperature for responses (default: `0.1`, range: 0.0-1.0)
+
+**LangSmith Configuration (for observability):**
+- `LANGCHAIN_TRACING_V2`: Enable tracing (default: `true`)
+- `LANGCHAIN_API_KEY`: Your LangSmith API key (get from https://smith.langchain.com/)
+- `LANGCHAIN_PROJECT`: Project name in LangSmith dashboard (default: `procurement-agent`)
+
+**Data Configuration:**
+- `DATA_PATH`: Path to datasets (default: `Agents - Code Challenge/Data/`)
+
+### 3. Install and Configure Ollama
+
+```bash
+# Download from https://ollama.ai
+ollama pull llama3.1:8b
+```
+
+### 4. Verify Configuration
+
+```bash
+python -c "from src.config import get_config_summary; print(get_config_summary())"
+```
+
+This will display your current configuration (with API key masked for security).
 
 ## Usage
 
@@ -115,7 +137,3 @@ Agents - Code Challenge/
 ```
 
 **Current Status:** Dependencies configured and installed (Story 1.2 complete)
-
-## License
-
-(To be determined)
