@@ -6,6 +6,23 @@ Automated procurement and sourcing decision support using LangChain, LangGraph, 
 
 This project implements an agent that analyzes commodity data (Energy Futures, Cotton Price, Cotton Export) to provide strategic procurement recommendations, supplier negotiation support, and market analysis.
 
+## Project Structure
+
+```
+Agents - Code Challenge/
+├── src/
+│   ├── agent/          # LangGraph ReAct agent and system prompts
+│   ├── tools/          # Analysis tools for historical, forecast, and driver data
+│   ├── data/           # Data loading and caching layer
+│   └── ui/             # Streamlit chat interface
+├── tests/              # Unit and integration tests
+├── Agents - Code Challenge/
+│   └── Data/           # Dataset files (3 commodities)
+├── venv/               # Virtual environment
+├── .gitignore          # Git ignore patterns
+└── README.md           # This file
+```
+
 ## Setup
 
 ### Prerequisites
@@ -15,21 +32,23 @@ This project implements an agent that analyzes commodity data (Energy Futures, C
 
 ### Virtual Environment Setup
 
+**Create Virtual Environment:**
+
 **Windows:**
 ```bash
-# Activate virtual environment
+python -m venv venv
 venv\Scripts\activate
 ```
 
 **macOS/Linux:**
 ```bash
-# Activate virtual environment
+python3 -m venv venv
 source venv/bin/activate
 ```
 
 ### Installation
 
-1. Activate the virtual environment (see commands above)
+1. Ensure virtual environment is activated (you should see `(venv)` in your terminal)
 2. Install dependencies:
    ```bash
    pip install -r requirements.txt
@@ -45,18 +64,6 @@ source venv/bin/activate
 - **Chat Interface:** streamlit (1.41.1)
 - **Testing:** pytest (8.3.4), pytest-cov (6.0.0)
 - **Development Tools:** python-dotenv (1.0.1)
-
-### Updating Dependencies
-
-To update dependencies to newer versions:
-
-1. Update version numbers in `requirements.txt`
-2. Activate virtual environment
-3. Run: `pip install -r requirements.txt --upgrade`
-4. Test imports: `pytest tests/test_dependencies.py -v`
-5. Verify no conflicts: `pip check`
-
-**Note:** Always test thoroughly after updating dependencies to ensure compatibility.
 
 ### Troubleshooting
 
@@ -214,19 +221,3 @@ python tests/integration/verify_recommendations.py
 ```
 
 **Integration Tests:** 10 verification scripts for end-to-end agent behavior
-
-## Project Structure
-
-```
-Agents - Code Challenge/
-├── src/
-│   ├── agent/          # LangGraph ReAct agent and system prompts
-│   ├── tools/          # Analysis tools for historical, forecast, and driver data
-│   ├── data/           # Data loading and caching layer
-│   └── ui/             # Streamlit chat interface
-├── tests/              # Unit and integration tests
-├── Agents - Code Challenge/
-│   └── Data/           # Dataset files (3 commodities)
-├── venv/               # Virtual environment
-├── .gitignore          # Git ignore patterns
-└── README.md           # This file
