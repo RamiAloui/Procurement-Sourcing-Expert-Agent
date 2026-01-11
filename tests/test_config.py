@@ -20,7 +20,7 @@ def test_ollama_configuration_defaults():
     from src.config import OLLAMA_BASE_URL, OLLAMA_MODEL
     
     assert OLLAMA_BASE_URL == "http://localhost:11434"
-    assert OLLAMA_MODEL == "llama3.1:8b"
+    assert OLLAMA_MODEL == "qwen3:8b"
 
 
 def test_langsmith_configuration_defaults():
