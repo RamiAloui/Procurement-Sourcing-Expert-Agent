@@ -165,7 +165,7 @@ This will display your current configuration (with API key masked for security).
 
 Run the Streamlit chat interface:
 ```bash
-streamlit run src/ui/app.py
+streamlit run src/ui/streamlit_app.py
 ```
 
 Or use the agent programmatically:

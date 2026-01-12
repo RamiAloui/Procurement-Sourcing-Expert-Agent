@@ -60,6 +60,13 @@ RESPONSE REQUIREMENTS:
 3. State assumptions: Identify and justify assumptions made
 4. Show uncertainty: Include confidence intervals for forecasts
 5. Format clearly: Bold key numbers/dates, use bullets, keep concise
+
+FORMATTING RULES:
+- Use ONLY standard markdown: **bold**, *italic*, bullet lists, numbered lists
+- NEVER use LaTeX math syntax (no $, $$, \*, or math formulas)
+- Write calculations in plain text: "171.00/ton" not "$171.00/ton$"
+- Use plain asterisks for multiplication: "5 * 10" not "5 ∗ 10"
+- Keep all text readable without special rendering
 """
 
 
@@ -81,6 +88,59 @@ def invoke_agent(question: str) -> str:
     
     # Extract final answer from messages
     return result["messages"][-1].content
+
+
+def stream_agent(question: str, history: list = None):
+    """Stream agent response with both state updates and LLM tokens.
+    
+    Args:
+        question: User's question
+        history: Optional list of previous messages for context
+    
+    Yields tuples of (chunk_type, content):
+    - ('status', 'message') for agent state updates (tool calls, etc.)
+    - ('token', 'text') for LLM token streaming
+    """
+    # Build message list with history
+    messages = history or []
+    messages.append(SystemMessage(content=SYSTEM_PROMPT))
+    messages.append(HumanMessage(content=question))
+    
+    for mode, chunk in agent.stream(
+        {"messages": messages},
+        stream_mode=["updates", "messages"]  # Both agent state AND tokens
+    ):
+        # Handle based on stream mode
+        if mode == "messages":
+            # Messages mode: (token, metadata)
+            token, metadata = chunk
+            node = metadata.get('langgraph_node')
+            
+            if node == 'agent':
+                # Stream LLM tokens
+                if hasattr(token, 'content') and token.content:
+                    yield ('token', token.content)
+        
+        elif mode == "updates":
+            # Updates mode: {node_name: {data}}
+            for node_name, node_data in chunk.items():
+                if node_name == 'tools':
+                    # Tool execution
+                    messages = node_data.get('messages', [])
+                    if messages:
+                        tool_msg = messages[-1]
+                        if hasattr(tool_msg, 'name'):
+                            yield ('status', f"Using tool: {tool_msg.name}")
+                
+                elif node_name == 'agent':
+                    # Agent thinking/planning
+                    messages = node_data.get('messages', [])
+                    if messages:
+                        last_msg = messages[-1]
+                        # Check if agent is calling tools
+                        if hasattr(last_msg, 'tool_calls') and last_msg.tool_calls:
+                            tool_names = [tc['name'] for tc in last_msg.tool_calls]
+                            yield ('status', f"Calling tools: {', '.join(tool_names)}")
 
 
 def invoke_agent_with_history(question: str, history: list = None):
