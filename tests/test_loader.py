@@ -51,21 +51,16 @@ class TestDataLoader:
 
     def test_load_historical_invalid_dataset(self, data_loader):
         """Test error handling for invalid dataset name."""
-        with pytest.raises(DatasetNotFoundError) as exc_info:
-            data_loader.load_historical("invalid_dataset")
-        
-        assert "invalid_dataset" in str(exc_info.value)
-        assert "Available datasets" in str(exc_info.value)
+        result = data_loader.load_historical("invalid_dataset")
+        assert result is None
 
     def test_load_historical_missing_file(self, tmp_path):
         """Test error handling for missing CSV file."""
         # Create loader with empty directory
         empty_loader = DataLoader(tmp_path)
         
-        with pytest.raises(DataLoadError) as exc_info:
-            empty_loader.load_historical("energy_futures")
-        
-        assert "not found" in str(exc_info.value).lower()
+        result = empty_loader.load_historical("energy_futures")
+        assert result is None
 
     def test_load_historical_invalid_csv_structure(self, tmp_path):
         """Test error handling for CSV with missing columns."""
@@ -124,20 +119,15 @@ class TestDataLoader:
     
     def test_load_forecast_invalid_dataset(self, data_loader):
         """Test error for invalid dataset name."""
-        with pytest.raises(DatasetNotFoundError) as exc_info:
-            data_loader.load_forecast("invalid_dataset")
-        
-        assert "invalid_dataset" in str(exc_info.value)
-        assert "Available datasets" in str(exc_info.value)
+        result = data_loader.load_forecast("invalid_dataset")
+        assert result is None
     
     def test_load_forecast_missing_file(self, tmp_path):
         """Test error for missing JSON file."""
         empty_loader = DataLoader(tmp_path)
         
-        with pytest.raises(DataLoadError) as exc_info:
-            empty_loader.load_forecast("energy_futures")
-        
-        assert "not found" in str(exc_info.value).lower()
+        result = empty_loader.load_forecast("energy_futures")
+        assert result is None
     
     def test_load_forecast_malformed_json(self, tmp_path):
         """Test error for malformed JSON."""

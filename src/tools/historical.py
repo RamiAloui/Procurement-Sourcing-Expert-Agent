@@ -10,6 +10,20 @@ def get_latest_value(dataset_name: str, data_path: str = "Agents - Code Challeng
     loader = DataLoader(data_path)
     df = loader.load_historical(dataset_name)
     
+    # Check if dataset was found
+    if df is None:
+        return {
+            'success': False,
+            'error': 'dataset_not_found',
+            'message': f"Dataset '{dataset_name}' not found. Available datasets: energy_futures, cotton_price, cotton_export",
+            'available_datasets': ['energy_futures', 'cotton_price', 'cotton_export'],
+            'alternatives': [
+                "What's the latest energy_futures price?",
+                "Show me cotton_price trends",
+                "Compare energy_futures and cotton_price"
+            ]
+        }
+    
     # Get last row
     latest = df.iloc[-1]
     
@@ -24,11 +38,64 @@ def get_value_by_date(dataset_name: str, date: str, data_path: str = "Agents - C
     loader = DataLoader(data_path)
     df = loader.load_historical(dataset_name)
     
+    # Check if dataset was found
+    if df is None:
+        return {
+            'success': False,
+            'error': 'dataset_not_found',
+            'message': f"Dataset '{dataset_name}' not found. Available datasets: energy_futures, cotton_price, cotton_export",
+            'available_datasets': ['energy_futures', 'cotton_price', 'cotton_export'],
+            'alternatives': [
+                "What's the latest energy_futures price?",
+                "Show me cotton_price trends",
+                "Compare energy_futures and cotton_price"
+            ]
+        }
+    
+    # Get available date range
+    min_date = df['Period'].min()
+    max_date = df['Period'].max()
+    
+    # Check if date is out of range
+    if date < min_date:
+        return {
+            'success': False,
+            'error': 'date_out_of_range',
+            'message': f"The date {date} is before available data range ({min_date} to {max_date}). Would you like data from {min_date} instead?",
+            'available_range': {'start': min_date, 'end': max_date},
+            'suggested_date': min_date,
+            'alternatives': [
+                f"What's the {dataset_name} price on {min_date}?",
+                f"Show me the latest {dataset_name} price",
+                f"What's the {dataset_name} trend from {min_date} to {max_date}?"
+            ]
+        }
+    
+    if date > max_date:
+        return {
+            'success': False,
+            'error': 'date_out_of_range',
+            'message': f"The date {date} is after available data range ({min_date} to {max_date}). Would you like data from {max_date} instead?",
+            'available_range': {'start': min_date, 'end': max_date},
+            'suggested_date': max_date,
+            'alternatives': [
+                f"What's the {dataset_name} price on {max_date}?",
+                f"Show me the latest {dataset_name} price",
+                f"What's the {dataset_name} forecast for the next 3 months?"
+            ]
+        }
+    
     # Filter by date
     result = df[df['Period'] == date]
     
     if result.empty:
-        raise ValueError(f"No data found for date {date}")
+        # Date is in range but not in data (e.g., missing day)
+        return {
+            'success': False,
+            'error': 'date_not_found',
+            'message': f"No data found for date {date}. Data is available from {min_date} to {max_date}.",
+            'available_range': {'start': min_date, 'end': max_date}
+        }
     
     return {
         'date': date,
@@ -41,10 +108,38 @@ def get_values_by_range(
     start_date: str, 
     end_date: str,
     data_path: str = "Agents - Code Challenge/Data"
-) -> List[Dict]:
+):
     """Get historical values for a date range."""
     loader = DataLoader(data_path)
     df = loader.load_historical(dataset_name)
+    
+    # Check if dataset was found
+    if df is None:
+        return {
+            'success': False,
+            'error': 'dataset_not_found',
+            'message': f"Dataset '{dataset_name}' not found. Available datasets: energy_futures, cotton_price, cotton_export",
+            'available_datasets': ['energy_futures', 'cotton_price', 'cotton_export'],
+            'alternatives': [
+                "What's the latest energy_futures price?",
+                "Show me cotton_price trends",
+                "Compare energy_futures and cotton_price"
+            ]
+        }
+    
+    # Get available date range
+    min_date = df['Period'].min()
+    max_date = df['Period'].max()
+    
+    # Check if requested range is out of bounds
+    if start_date < min_date or end_date > max_date:
+        return {
+            'success': False,
+            'error': 'date_range_out_of_bounds',
+            'message': f"Requested range ({start_date} to {end_date}) is outside available data ({min_date} to {max_date}).",
+            'available_range': {'start': min_date, 'end': max_date},
+            'suggested_range': {'start': max(start_date, min_date), 'end': min(end_date, max_date)}
+        }
     
     # Filter by date range
     mask = (df['Period'] >= start_date) & (df['Period'] <= end_date)
@@ -70,12 +165,44 @@ def calculate_percentage_change(
     loader = DataLoader(data_path)
     df = loader.load_historical(dataset_name)
     
+    # Check if dataset was found
+    if df is None:
+        return {
+            'success': False,
+            'error': 'dataset_not_found',
+            'message': f"Dataset '{dataset_name}' not found. Available datasets: energy_futures, cotton_price, cotton_export",
+            'available_datasets': ['energy_futures', 'cotton_price', 'cotton_export'],
+            'alternatives': [
+                "What's the latest energy_futures price?",
+                "Show me cotton_price trends",
+                "Compare energy_futures and cotton_price"
+            ]
+        }
+    
+    # Get available date range
+    min_date = df['Period'].min()
+    max_date = df['Period'].max()
+    
+    # Check if dates are out of range
+    if start_date < min_date or end_date > max_date:
+        return {
+            'success': False,
+            'error': 'date_out_of_range',
+            'message': f"One or both dates are outside available range ({min_date} to {max_date}).",
+            'available_range': {'start': min_date, 'end': max_date}
+        }
+    
     # Get values for dates
     start_row = df[df['Period'] == start_date]
     end_row = df[df['Period'] == end_date]
     
     if start_row.empty or end_row.empty:
-        raise ValueError(f"Date not found in data")
+        return {
+            'success': False,
+            'error': 'date_not_found',
+            'message': f"One or both dates not found in data. Available range: {min_date} to {max_date}.",
+            'available_range': {'start': min_date, 'end': max_date}
+        }
     
     start_value = float(start_row.iloc[0]['Value'])
     end_value = float(end_row.iloc[0]['Value'])

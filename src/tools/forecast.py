@@ -14,11 +14,36 @@ def get_forecast(
     loader = DataLoader(data_path)
     forecast_data = loader.load_forecast(dataset_name)
     
-    # Get forecast series (0.5 quantile = median/point forecast)
-    if months_ahead < 1 or months_ahead > len(forecast_data.forecast_series):
-        raise ValueError(
-            f"months_ahead must be between 1 and {len(forecast_data.forecast_series)}"
-        )
+    # Check if dataset was found
+    if forecast_data is None:
+        return {
+            'success': False,
+            'error': 'dataset_not_found',
+            'message': f"Dataset '{dataset_name}' not found. Available datasets: energy_futures, cotton_price, cotton_export",
+            'available_datasets': ['energy_futures', 'cotton_price', 'cotton_export'],
+            'alternatives': [
+                "What's the energy_futures forecast for next month?",
+                "Show me cotton_price forecast",
+                "Compare current and forecast prices for energy_futures"
+            ]
+        }
+    
+    max_horizon = len(forecast_data.forecast_series)
+    
+    # Validate forecast horizon
+    if months_ahead < 1 or months_ahead > max_horizon:
+        return {
+            'success': False,
+            'error': 'forecast_out_of_range',
+            'message': f"Forecast for {months_ahead} months ahead is not available. Maximum forecast horizon is {max_horizon} months.",
+            'max_horizon': max_horizon,
+            'available_range': {'min_months': 1, 'max_months': max_horizon},
+            'alternatives': [
+                f"What's the {dataset_name} forecast for {max_horizon} months ahead?",
+                f"Show me the {dataset_name} forecast for next month",
+                f"What's the {dataset_name} trend over the next 3 months?"
+            ]
+        }
     
     # Forecasts are 0-indexed, so months_ahead=1 is index 0
     date = forecast_data.forecast_series[months_ahead - 1]
@@ -39,10 +64,29 @@ def get_forecast_with_quantiles(
     loader = DataLoader(data_path)
     forecast_data = loader.load_forecast(dataset_name)
     
-    if months_ahead < 1 or months_ahead > len(forecast_data.forecast_series):
-        raise ValueError(
-            f"months_ahead must be between 1 and {len(forecast_data.forecast_series)}"
-        )
+    # Check if dataset was found
+    if forecast_data is None:
+        return {
+            'success': False,
+            'error': 'dataset_not_found',
+            'message': f"Dataset '{dataset_name}' not found. Available datasets: energy_futures, cotton_price, cotton_export",
+            'available_datasets': ['energy_futures', 'cotton_price', 'cotton_export'],
+            'alternatives': [
+                "What's the energy_futures forecast for next month?",
+                "Show me cotton_price forecast",
+                "Compare current and forecast prices for energy_futures"
+            ]
+        }
+    
+    max_horizon = len(forecast_data.forecast_series)
+    
+    if months_ahead < 1 or months_ahead > max_horizon:
+        return {
+            'success': False,
+            'error': 'forecast_out_of_range',
+            'message': f"Forecast for {months_ahead} months ahead is not available. Maximum forecast horizon is {max_horizon} months.",
+            'max_horizon': max_horizon
+        }
     
     date = forecast_data.forecast_series[months_ahead - 1]
     
@@ -62,6 +106,33 @@ def get_forecast_by_date(
     loader = DataLoader(data_path)
     forecast_data = loader.load_forecast(dataset_name)
     
+    # Check if dataset was found
+    if forecast_data is None:
+        return {
+            'success': False,
+            'error': 'dataset_not_found',
+            'message': f"Dataset '{dataset_name}' not found. Available datasets: energy_futures, cotton_price, cotton_export",
+            'available_datasets': ['energy_futures', 'cotton_price', 'cotton_export'],
+            'alternatives': [
+                "What's the energy_futures forecast for next month?",
+                "Show me cotton_price forecast",
+                "Compare current and forecast prices for energy_futures"
+            ]
+        }
+    
+    # Get available forecast date range
+    min_forecast_date = forecast_data.forecast_series[0]
+    max_forecast_date = forecast_data.forecast_series[-1]
+    
+    # Check if date is out of forecast range
+    if date < min_forecast_date or date > max_forecast_date:
+        return {
+            'success': False,
+            'error': 'date_out_of_forecast_range',
+            'message': f"No forecast available for {date}. Forecasts are available from {min_forecast_date} to {max_forecast_date}.",
+            'available_range': {'start': min_forecast_date, 'end': max_forecast_date}
+        }
+    
     # Find matching date in forecast series
     try:
         index = forecast_data.forecast_series.index(date)
@@ -72,7 +143,12 @@ def get_forecast_by_date(
             'forecast_value': float(value)
         }
     except ValueError:
-        raise ValueError(f"No forecast found for date {date}")
+        return {
+            'success': False,
+            'error': 'date_not_in_forecast',
+            'message': f"No forecast found for date {date}. Available range: {min_forecast_date} to {max_forecast_date}.",
+            'available_range': {'start': min_forecast_date, 'end': max_forecast_date}
+        }
 
 
 def get_all_forecasts(
@@ -104,10 +180,30 @@ def get_quantile_forecast(
     forecast_data = loader.load_forecast(dataset_name)
     
     # Convert quantile to string key
+    # Check if dataset was found
+    if forecast_data is None:
+        return {
+            'success': False,
+            'error': 'dataset_not_found',
+            'message': f"Dataset '{dataset_name}' not found. Available datasets: energy_futures, cotton_price, cotton_export",
+            'available_datasets': ['energy_futures', 'cotton_price', 'cotton_export'],
+            'alternatives': [
+                "What's the energy_futures forecast for next month?",
+                "Show me cotton_price forecast",
+                "Compare current and forecast prices for energy_futures"
+            ]
+        }
+    
     quantile_key = str(quantile)
     
     if quantile_key not in forecast_data.quantile_forecast:
-        raise ValueError(f"Quantile {quantile} not available")
+        available_quantiles = list(forecast_data.quantile_forecast.keys())
+        return {
+            'success': False,
+            'error': 'quantile_not_available',
+            'message': f"Quantile {quantile} not available. Available quantiles: {', '.join(available_quantiles)}",
+            'available_quantiles': available_quantiles
+        }
     
     # Find date index
     try:
@@ -137,7 +233,12 @@ def get_confidence_interval(
     }
     
     if confidence_level not in quantile_map:
-        raise ValueError(f"Confidence level must be 80 or 90, got {confidence_level}")
+        return {
+            'success': False,
+            'error': 'invalid_confidence_level',
+            'message': f"Confidence level {confidence_level}% not supported. Available levels: 80%, 90%",
+            'available_levels': [80, 90]
+        }
     
     lower_q, upper_q = quantile_map[confidence_level]
     
@@ -202,11 +303,30 @@ def analyze_forecast_trend(
     loader = DataLoader(data_path)
     forecast_data = loader.load_forecast(dataset_name)
     
+    # Check if dataset was found
+    if forecast_data is None:
+        return {
+            'success': False,
+            'error': 'dataset_not_found',
+            'message': f"Dataset '{dataset_name}' not found. Available datasets: energy_futures, cotton_price, cotton_export",
+            'available_datasets': ['energy_futures', 'cotton_price', 'cotton_export'],
+            'alternatives': [
+                "What's the energy_futures forecast for next month?",
+                "Show me cotton_price forecast",
+                "Compare current and forecast prices for energy_futures"
+            ]
+        }
+    
+    max_horizon = len(forecast_data.forecast_series)
+    
     # Validate months_ahead
-    if months_ahead < 2 or months_ahead > len(forecast_data.forecast_series):
-        raise ValueError(
-            f"months_ahead must be between 2 and {len(forecast_data.forecast_series)}"
-        )
+    if months_ahead < 2 or months_ahead > max_horizon:
+        return {
+            'success': False,
+            'error': 'forecast_out_of_range',
+            'message': f"Forecast trend analysis requires at least 2 months. Maximum available: {max_horizon} months.",
+            'max_horizon': max_horizon
+        }
     
     # Get forecast values for the period (0.5 quantile = point forecast)
     forecast_values = forecast_data.quantile_forecast["0.5"][:months_ahead]

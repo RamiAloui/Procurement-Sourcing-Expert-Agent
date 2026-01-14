@@ -70,7 +70,14 @@ def get_driver_details(
             break
     
     if not driver_info:
-        raise ValueError(f"Driver not found: {driver_name}")
+        # Get list of available drivers for suggestion
+        available_drivers = [d.get('driver_name', 'Unknown') for d in drivers_data.values() if not d.get('driver_name', '').startswith('target_')]
+        return {
+            'success': False,
+            'error': 'driver_not_found',
+            'message': f"Driver '{driver_name}' not found. Try one of the available drivers or use top_n parameter to see most important drivers.",
+            'available_drivers': available_drivers[:5]  # Show top 5 as examples
+        }
     
     # Extract direction
     direction_value = driver_info.get('direction', {}).get('overall', {}).get('mean', 0)

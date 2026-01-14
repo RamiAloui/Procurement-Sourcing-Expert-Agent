@@ -16,6 +16,9 @@ Agents - Code Challenge/
 │   ├── data/           # Data loading and caching layer
 │   └── ui/             # Streamlit chat interface
 ├── tests/              # Unit and integration tests
+├── docs/               # Detailed documentation
+│   ├── Architecture.md # System design and decisions
+│   └── Tools_Guide.md  # Tool usage and examples
 ├── Agents - Code Challenge/
 │   └── Data/           # Dataset files (3 commodities)
 ├── venv/               # Virtual environment
@@ -161,6 +164,12 @@ python -c "from src.config import get_config_summary; print(get_config_summary()
 
 This will display your current configuration (with API key masked for security).
 
+## Documentation
+
+For more details, see:
+- **[Architecture Overview](docs/Architecture.md)** - System design and design decisions
+- **[Tools Guide](docs/Tools_Guide.md)** - Detailed tool documentation with examples
+
 ## Usage
 
 Run the Streamlit chat interface:
@@ -183,7 +192,9 @@ print(response)
 pytest tests/ --ignore=tests/integration/
 ```
 
-**Current Status:** 198 tests passing
+**Current Status:** 210 tests passing (198 unit tests + 12 integration tests)
+
+For detailed information about integration tests, see [tests/integration/README.md](tests/integration/README.md).
 
 ### Run Tests with Coverage Report
 ```bash
@@ -192,32 +203,29 @@ pytest tests/ --cov=src --cov-report=html --cov-report=term --ignore=tests/integ
 
 Open `htmlcov/index.html` in your browser to view the detailed coverage report.
 
-**Current Coverage:** 79% (851 statements, 181 missed)
+**Current Coverage:** 72%
 
 **Coverage by Module:**
 - `src/data/models.py`: 100%
 - `src/config.py`: 100%
-- `src/tools/historical.py`: 94%
-- `src/tools/drivers.py`: 90%
-- `src/data/loader.py`: 89%
-- `src/tools/recommendations.py`: 89%
-- `src/tools/forecast.py`: 88%
-- `src/tools/negotiation.py`: 88%
-- `src/tools/comparative.py`: 81%
+- `src/tools/historical.py`: 95%
+- `src/tools/drivers.py`: 92%
+- `src/data/loader.py`: 91%
+- `src/tools/recommendations.py`: 90%
+- `src/tools/forecast.py`: 89%
+- `src/tools/negotiation.py`: 89%
+- `src/tools/comparative.py`: 83%
 
 **Note:** Agent files (`src/agent/`) have 0% coverage as they require LLM integration and are tested via integration tests instead.
 
 ### Run Integration Tests
+
+Integration tests validate end-to-end agent behavior with real LLM interactions.
+
+**Quick run:**
 ```bash
 # Requires Ollama to be running
 python tests/integration/verify_agent.py
-python tests/integration/verify_citations.py
-python tests/integration/verify_classification.py
-python tests/integration/verify_conversation_context.py
-python tests/integration/verify_impact_analysis.py
-python tests/integration/verify_multi_commodity_scenario.py
-python tests/integration/verify_production_sequencing.py
-python tests/integration/verify_recommendations.py
 ```
 
-**Integration Tests:** 10 verification scripts for end-to-end agent behavior
+**For all integration tests and detailed documentation, see [tests/integration/README.md](tests/integration/README.md).**

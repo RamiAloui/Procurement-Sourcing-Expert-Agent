@@ -34,10 +34,11 @@ def test_get_value_by_date_valid():
 
 def test_get_value_by_date_invalid():
     """Test error for invalid date."""
-    with pytest.raises(ValueError) as exc_info:
-        get_value_by_date("energy_futures", "2099-01-01")
+    result = get_value_by_date("energy_futures", "2099-01-01")
     
-    assert "No data found" in str(exc_info.value)
+    assert isinstance(result, dict)
+    assert result.get('success') is False
+    assert 'message' in result
 
 
 def test_get_values_by_range_valid():
@@ -53,7 +54,8 @@ def test_get_values_by_range_empty():
     """Test empty result for out-of-range dates."""
     result = get_values_by_range("energy_futures", "2099-01-01", "2099-12-31")
     
-    assert result == []
+    assert isinstance(result, dict)
+    assert result.get('success') is False
 
 
 def test_calculate_percentage_change():

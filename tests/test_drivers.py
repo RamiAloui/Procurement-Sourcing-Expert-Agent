@@ -94,10 +94,14 @@ def test_get_driver_details_correlations():
 
 def test_get_driver_details_not_found():
     """Test error handling for driver not found."""
-    with pytest.raises(ValueError) as exc_info:
-        get_driver_details("energy_futures", "Nonexistent Driver")
+    result = get_driver_details("energy_futures", "Nonexistent Driver")
     
-    assert "not found" in str(exc_info.value).lower()
+    assert isinstance(result, dict)
+    assert result.get('success') is False
+    assert 'available_drivers' in result
+    assert isinstance(result, dict)
+    assert result.get('success') is False
+    assert 'available_drivers' in result
 
 
 def test_get_driver_details_with_lag():

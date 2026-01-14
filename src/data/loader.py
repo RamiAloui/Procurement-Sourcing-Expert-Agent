@@ -36,10 +36,8 @@ class DataLoader:
         
         # Validate dataset name
         if dataset_name not in DATASET_MAPPING:
-            raise DatasetNotFoundError(
-                f"Dataset '{dataset_name}' not found. "
-                f"Available datasets: {', '.join(DATASET_MAPPING.keys())}"
-            )
+            logger.warning(f"Dataset '{dataset_name}' not found in mapping")
+            return None
         
         # Build file path
         dataset_folder = DATASET_MAPPING[dataset_name]
@@ -47,9 +45,8 @@ class DataLoader:
         
         # Check file exists
         if not csv_path.exists():
-            raise DataLoadError(
-                f"Historical data file not found: {csv_path}"
-            )
+            logger.warning(f"Historical data file not found: {csv_path}")
+            return None
         
         # Load CSV
         try:
@@ -83,10 +80,8 @@ class DataLoader:
         
         # Validate dataset name
         if dataset_name not in DATASET_MAPPING:
-            raise DatasetNotFoundError(
-                f"Dataset '{dataset_name}' not found. "
-                f"Available datasets: {', '.join(DATASET_MAPPING.keys())}"
-            )
+            logger.warning(f"Dataset '{dataset_name}' not found in mapping")
+            return None
         
         # Build file path
         dataset_folder = DATASET_MAPPING[dataset_name]
@@ -94,9 +89,8 @@ class DataLoader:
         
         # Check file exists
         if not json_path.exists():
-            raise DataLoadError(
-                f"Forecast data file not found: {json_path}"
-            )
+            logger.warning(f"Forecast data file not found: {json_path}")
+            return None
         
         # Load JSON
         try:

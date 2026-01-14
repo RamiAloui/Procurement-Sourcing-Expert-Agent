@@ -43,10 +43,11 @@ def test_get_forecast_by_date_valid():
 
 def test_get_forecast_by_date_invalid():
     """Test error for date not in forecast horizon."""
-    with pytest.raises(ValueError) as exc_info:
-        get_forecast_by_date("energy_futures", "2099-01-01")
+    result = get_forecast_by_date("energy_futures", "2099-01-01")
     
-    assert "No forecast found" in str(exc_info.value)
+    assert isinstance(result, dict)
+    assert result.get('success') is False
+    assert 'message' in result
 
 
 def test_get_all_forecasts():
@@ -97,10 +98,11 @@ def test_get_confidence_interval_invalid_level():
     all_forecasts = get_all_forecasts("energy_futures")
     valid_date = all_forecasts[0]['date']
     
-    with pytest.raises(ValueError) as exc_info:
-        get_confidence_interval("energy_futures", valid_date, confidence_level=95)
+    result = get_confidence_interval("energy_futures", valid_date, confidence_level=95)
     
-    assert "must be 80 or 90" in str(exc_info.value)
+    assert isinstance(result, dict)
+    assert result.get('success') is False
+    assert 'available_levels' in result
 
 
 def test_compare_current_to_forecast():
