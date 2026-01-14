@@ -42,7 +42,7 @@ def recommend_forward_buy(
         savings = 0
         action = "monitoring"
     
-    # Check for high uncertainty (small but exists, suggest hedging)
+    # Check for high uncertainty
     if abs(pct_change) > 0.5 and abs(pct_change) <= 2:
         recommendation = "hedge"
         rationale = "Price movement uncertain. Consider buying 50-70% now, wait on rest."
@@ -70,9 +70,6 @@ def calculate_impact_analysis(
     data_path: str = "Agents - Code Challenge/Data"
 ) -> Dict:
     """Calculate quantified impact analysis with best/expected/worst scenarios.
-    
-    Uses forecast confidence intervals to provide risk assessment for
-    procurement decisions.
     """
     current = get_latest_value(dataset_name, data_path)
     current_price = current['value']
@@ -138,9 +135,6 @@ def analyze_multi_commodity_scenario(
     data_path: str = "Agents - Code Challenge/Data"
 ) -> Dict:
     """Analyze complex scenarios involving multiple commodities.
-    
-    Provides holistic procurement strategy by analyzing all commodities together,
-    considering correlations and prioritizing recommendations.
     """
     recommendations = {}
     for dataset in dataset_names:
@@ -217,9 +211,6 @@ def recommend_production_sequencing(
     data_path: str = "Agents - Code Challenge/Data"
 ) -> Dict:
     """Recommend production sequencing based on commodity forecasts.
-    
-    Identifies which commodities have favorable forecasts (stable/falling) and
-    recommends prioritizing production activities using those commodities.
     """
     commodity_analysis = []
     

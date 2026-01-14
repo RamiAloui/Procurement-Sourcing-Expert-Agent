@@ -27,7 +27,7 @@ def query_historical_data(
             'count': len(values)
         }
     
-    # Handle "latest" keyword - treat as latest value query
+    # Handle "latest" keyword - treat as latest value query (this is to fix when agent queries "latest" instead of "none" as defined in the tool)
     if date and date.lower() in ["latest", "current", "now"]:
         date = None
     
@@ -58,7 +58,6 @@ def query_forecast_data(
     """Get future price forecasts for commodities."""
     data_path = "Agents - Code Challenge/Data"
     
-    # Handle keywords - treat as default months_ahead query
     if date and date.lower() in ["latest", "next", "soon"]:
         date = None
     
@@ -116,7 +115,7 @@ def compare_commodities(
     """Compare multiple commodities to find correlations and relationships."""
     data_path = "Agents - Code Challenge/Data"
     
-    # Get aligned data across all datasets
+    # aligning data across all datasets
     result = comparative.compare_datasets(dataset_names, data_path)
     
     return {

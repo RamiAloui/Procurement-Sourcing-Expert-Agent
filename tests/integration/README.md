@@ -1,13 +1,13 @@
 # Integration Tests
 
-This folder contains integration tests that validate end-to-end agent behavior with real LLM interactions.
+This folder contains essential integration tests that validate end-to-end agent behavior with real LLM interactions.
 
 ## Purpose
 
-These tests are **not** part of the automated unit test suite. They are used for:
-- End-to-end validation of agent behavior
-- Testing integrations that require external services (Ollama, LangSmith)
-- Validating agent reasoning and tool selection with real LLM responses
+These tests complement the unit tests and validate:
+- Core agent functionality with real LLM responses
+- Tool registration and invocation
+- LangSmith tracing integration
 
 ## Scripts
 
@@ -40,4 +40,4 @@ python tests/integration/verify_tools.py
 
 ## Note
 
-These integration tests require Ollama to be running and validate the full agent workflow with real LLM responses. They complement the automated unit tests in the parent `tests/` directory.
+These integration tests require Ollama to be running and validate the core agent workflow. They provide practical validation of the main functionality without over-testing edge cases.

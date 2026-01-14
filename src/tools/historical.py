@@ -24,7 +24,7 @@ def get_latest_value(dataset_name: str, data_path: str = "Agents - Code Challeng
             ]
         }
     
-    # Get last row
+    # Last row
     latest = df.iloc[-1]
     
     return {
@@ -52,7 +52,7 @@ def get_value_by_date(dataset_name: str, date: str, data_path: str = "Agents - C
             ]
         }
     
-    # Get available date range
+    # Available date range
     min_date = df['Period'].min()
     max_date = df['Period'].max()
     
@@ -89,7 +89,7 @@ def get_value_by_date(dataset_name: str, date: str, data_path: str = "Agents - C
     result = df[df['Period'] == date]
     
     if result.empty:
-        # Date is in range but not in data (e.g., missing day)
+        # Date is in range but not in data
         return {
             'success': False,
             'error': 'date_not_found',
@@ -131,7 +131,7 @@ def get_values_by_range(
     min_date = df['Period'].min()
     max_date = df['Period'].max()
     
-    # Check if requested range is out of bounds
+    # Check if requested range is out
     if start_date < min_date or end_date > max_date:
         return {
             'success': False,
@@ -179,7 +179,7 @@ def calculate_percentage_change(
             ]
         }
     
-    # Get available date range
+    # Available date range
     min_date = df['Period'].min()
     max_date = df['Period'].max()
     
@@ -192,7 +192,7 @@ def calculate_percentage_change(
             'available_range': {'start': min_date, 'end': max_date}
         }
     
-    # Get values for dates
+    # Values for dates
     start_row = df[df['Period'] == start_date]
     end_row = df[df['Period'] == end_date]
     
@@ -207,11 +207,11 @@ def calculate_percentage_change(
     start_value = float(start_row.iloc[0]['Value'])
     end_value = float(end_row.iloc[0]['Value'])
     
-    # Calculate percentage change
+    # Calculation of percentage change
     pct_change = ((end_value - start_value) / start_value) * 100
     pct_change = round(pct_change, 2)
     
-    # Determine trend
+    # Determination of trend
     if pct_change > 0:
         trend = "increasing"
     elif pct_change < 0:
@@ -255,7 +255,7 @@ def find_peak(
         mask = (df['Period'] >= start_date) & (df['Period'] <= end_date)
         df = df[mask]
     
-    # Find max value
+    # Max value
     max_idx = df['Value'].idxmax()
     peak_row = df.loc[max_idx]
     
@@ -281,7 +281,7 @@ def find_valley(
         mask = (df['Period'] >= start_date) & (df['Period'] <= end_date)
         df = df[mask]
     
-    # Find min value
+    # Min value
     min_idx = df['Value'].idxmin()
     valley_row = df.loc[min_idx]
     
@@ -324,10 +324,10 @@ def calculate_moving_average(
         mask = (df['Period'] >= start_date) & (df['Period'] <= end_date)
         df = df[mask].copy()
     
-    # Calculate moving average
+    # Calculation of moving average
     df['MA'] = df['Value'].rolling(window=window_size).mean()
     
-    # Drop NaN values (first window_size-1 rows)
+    # Drop NaN values
     df = df.dropna()
     
     # Convert to list of dicts
@@ -352,14 +352,14 @@ def calculate_trend_line(
         mask = (df['Period'] >= start_date) & (df['Period'] <= end_date)
         df = df[mask].copy()
     
-    # Create x values (0, 1, 2, ...)
+    # Create x values
     x = np.arange(len(df))
     y = df['Value'].values
     
-    # Calculate linear regression
+    # Linear regression
     slope, intercept = np.polyfit(x, y, 1)
     
-    # Determine trend
+    #  Trend
     if slope > 0:
         trend = "increasing"
     elif slope < 0:

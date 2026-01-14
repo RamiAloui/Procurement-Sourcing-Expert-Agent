@@ -10,18 +10,12 @@ def get_top_drivers(
     data_path: str = "Agents - Code Challenge/Data"
 ) -> List[Dict]:
     """Get top N market drivers sorted by importance score.
-    
-    Args:
-        dataset_name: Name of dataset
-        top_n: Number of top drivers to return (default: 5)
-        data_path: Path to data directory
-    
     Returns list of dicts with driver name and importance metrics.
     """
     loader = DataLoader(data_path)
     drivers_data = loader.load_drivers(dataset_name)
     
-    # Extract drivers (skip target entry)
+    # Extracting drivers
     drivers = []
     for driver_id, driver_info in drivers_data.items():
         # Skip target entry (doesn't have importance scores)
@@ -41,7 +35,6 @@ def get_top_drivers(
     # Sort by mean importance descending
     drivers.sort(key=lambda x: x['importance_mean'], reverse=True)
     
-    # Return top N
     return drivers[:top_n]
 
 
@@ -50,13 +43,7 @@ def get_driver_details(
     driver_name: str,
     data_path: str = "Agents - Code Challenge/Data"
 ) -> Dict:
-    """Get detailed information for a specific driver.
-    
-    Args:
-        dataset_name: Name of dataset
-        driver_name: Name of the driver to query
-        data_path: Path to data directory
-    
+    """Detailed information for a specific driver.
     Returns dict with driver details including direction and correlations.
     """
     loader = DataLoader(data_path)
@@ -70,16 +57,15 @@ def get_driver_details(
             break
     
     if not driver_info:
-        # Get list of available drivers for suggestion
+        # List of available drivers for suggestion
         available_drivers = [d.get('driver_name', 'Unknown') for d in drivers_data.values() if not d.get('driver_name', '').startswith('target_')]
         return {
             'success': False,
             'error': 'driver_not_found',
             'message': f"Driver '{driver_name}' not found. Try one of the available drivers or use top_n parameter to see most important drivers.",
-            'available_drivers': available_drivers[:5]  # Show top 5 as examples
+            'available_drivers': available_drivers[:5]
         }
     
-    # Extract direction
     direction_value = driver_info.get('direction', {}).get('overall', {}).get('mean', 0)
     if direction_value is None:
         direction_value = 0
@@ -131,7 +117,7 @@ def analyze_drivers_combined(
     top_n: int = 10,
     data_path: str = "Agents - Code Challenge/Data"
 ) -> Dict:
-    """Analyze multiple drivers together to understand combined effects.
+    """Analyze multiple drivers together.
     
     Args:
         dataset_name: Name of dataset
@@ -140,7 +126,7 @@ def analyze_drivers_combined(
     
     Returns dict with drivers categorized by direction and net effect summary.
     """
-    # Get top drivers
+    # Top drivers
     top_drivers = get_top_drivers(dataset_name, top_n, data_path)
     
     # Categorize drivers by direction
@@ -166,7 +152,7 @@ def analyze_drivers_combined(
     positive_total = sum(d['importance'] for d in positive_drivers)
     negative_total = sum(d['importance'] for d in negative_drivers)
     
-    # Determine net effect
+    # Net effect
     if positive_total > negative_total * 1.2:
         net_effect = "increase"
         net_explanation = "Drivers strongly support price increases"

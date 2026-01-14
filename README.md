@@ -1,6 +1,6 @@
 # Procurement & Sourcing Expert Agent
 
-Automated procurement and sourcing decision support using LangChain, LangGraph, and LangSmith.
+An intelligent agent that helps with procurement decisions by analyzing commodity data and providing market insights.
 
 ## Overview
 
@@ -177,6 +177,12 @@ Run the Streamlit chat interface:
 streamlit run src/ui/streamlit_app.py
 ```
 
+### Demo
+
+![Demo](demo.png)
+
+*Chat interface showing the agent responding to procurement queries*
+
 Or use the agent programmatically:
 ```python
 from src.agent.agent import invoke_agent
@@ -187,36 +193,40 @@ print(response)
 
 ## Testing
 
-### Run Unit Tests
+### Run All Tests
+```bash
+pytest tests/
+```
+
+### Run Unit Tests Only
 ```bash
 pytest tests/ --ignore=tests/integration/
 ```
 
-**Current Status:** 210 tests passing (198 unit tests + 12 integration tests)
-
-For detailed information about integration tests, see [tests/integration/README.md](tests/integration/README.md).
+**Current Status:** 138 tests passing with 62% coverage
 
 ### Run Tests with Coverage Report
 ```bash
-pytest tests/ --cov=src --cov-report=html --cov-report=term --ignore=tests/integration/
+pytest tests/ --cov=src --cov-report=html --cov-report=term
 ```
 
 Open `htmlcov/index.html` in your browser to view the detailed coverage report.
 
-**Current Coverage:** 72%
+**Current Coverage:** 62% (target: 60%)
 
 **Coverage by Module:**
 - `src/data/models.py`: 100%
 - `src/config.py`: 100%
-- `src/tools/historical.py`: 95%
-- `src/tools/drivers.py`: 92%
-- `src/data/loader.py`: 91%
-- `src/tools/recommendations.py`: 90%
-- `src/tools/forecast.py`: 89%
-- `src/tools/negotiation.py`: 89%
-- `src/tools/comparative.py`: 83%
-
-**Note:** Agent files (`src/agent/`) have 0% coverage as they require LLM integration and are tested via integration tests instead.
+- `src/data/loader.py`: 90%
+- `src/tools/drivers.py`: 90%
+- `src/tools/historical.py`: 88%
+- `src/tools/comparative.py`: 81%
+- `src/tools/forecast.py`: 73%
+- `src/tools/negotiation.py`: 35%
+- `src/tools/recommendations.py`: 15%
+- `src/agent/agent.py`: 22%
+- `src/agent/llm.py`: 47%
+- `src/agent/tools.py`: 37%
 
 ### Run Integration Tests
 

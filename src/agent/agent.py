@@ -6,7 +6,7 @@ from src.agent.llm import get_llm
 from src.agent.tools import TOOLS
 
 
-# System prompt for procurement expert behavior
+# System prompt for agent behavior
 SYSTEM_PROMPT = """You are a procurement and sourcing expert agent.
 
 Datasets: energy_futures, cotton_price, cotton_export
@@ -87,7 +87,7 @@ FORMATTING RULES:
 """
 
 
-# Create ReAct agent
+# ReAct agent
 agent = create_react_agent(
     get_llm(),
     TOOLS
@@ -118,7 +118,7 @@ def stream_agent(question: str, history: list = None):
     - ('status', 'message') for agent state updates (tool calls, etc.)
     - ('token', 'text') for LLM token streaming
     """
-    # Build message list with history
+    # Message list with history to maintain context
     messages = history or []
     messages.append(SystemMessage(content=SYSTEM_PROMPT))
     messages.append(HumanMessage(content=question))
@@ -139,7 +139,6 @@ def stream_agent(question: str, history: list = None):
                     yield ('token', token.content)
         
         elif mode == "updates":
-            # Updates mode: {node_name: {data}}
             for node_name, node_data in chunk.items():
                 if node_name == 'tools':
                     # Tool execution
@@ -150,11 +149,11 @@ def stream_agent(question: str, history: list = None):
                             yield ('status', f"Using tool: {tool_msg.name}")
                 
                 elif node_name == 'agent':
-                    # Agent thinking/planning
+                    # Agent planning or thinking
                     messages = node_data.get('messages', [])
                     if messages:
                         last_msg = messages[-1]
-                        # Check if agent is calling tools
+                        # To check if agent is calling tools
                         if hasattr(last_msg, 'tool_calls') and last_msg.tool_calls:
                             tool_names = [tc['name'] for tc in last_msg.tool_calls]
                             yield ('status', f"Calling tools: {', '.join(tool_names)}")

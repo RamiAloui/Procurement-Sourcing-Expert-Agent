@@ -1,5 +1,5 @@
-# AI Agent Framework
-# Requires Python >=3.10.0, <4.0.0 (verified compatible with 3.11.2)
+# Procurement Agent Dependencies
+
 langchain==1.2.2
 langgraph==1.0.5
 langsmith==0.3.45

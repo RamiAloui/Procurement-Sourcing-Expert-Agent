@@ -69,21 +69,18 @@ if "messages" not in st.session_state:
 if "is_streaming" not in st.session_state:
     st.session_state.is_streaming = False
 
-# Display chat history
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"], unsafe_allow_html=False)
 
-# User input
 if prompt := st.chat_input("Ask about procurement data..."):
     # Add user message to history
     st.session_state.messages.append({"role": "user", "content": prompt})
     st.session_state.is_streaming = True
     st.rerun()
     
-# Stream agent response if flag is set
+# Stream
 if st.session_state.is_streaming:
-    # Get the last user message
     prompt = st.session_state.messages[-1]["content"]
     
     try:
@@ -93,7 +90,7 @@ if st.session_state.is_streaming:
             full_response = ""
             has_started_response = False
             
-            # Show initial loading indicator with animation
+            
             status_placeholder.markdown('<span class="loading-dots"></span>', unsafe_allow_html=True)
             
             # Convert session history to LangChain message format
@@ -106,21 +103,17 @@ if st.session_state.is_streaming:
             
             # Stream both status updates and tokens with conversation history
             for chunk_type, content in stream_agent(prompt, history):
-                if chunk_type == 'status':
-                    # Show agent progress with shimmer animation
+                if chunk_type == 'status':               
                     if not has_started_response:
                         status_placeholder.markdown(
                             f'<span class="tool-status">{content}...</span>',
                             unsafe_allow_html=True
                         )
                 
-                elif chunk_type == 'token':
-                    # Clear status when response starts
+                elif chunk_type == 'token':                
                     if not has_started_response:
                         status_placeholder.empty()
-                        has_started_response = True
-                    
-                    # Accumulate and display tokens
+                        has_started_response = True                             
                     full_response += content
                     response_placeholder.markdown(full_response, unsafe_allow_html=False)
         

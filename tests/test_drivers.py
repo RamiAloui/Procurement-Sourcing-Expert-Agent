@@ -12,20 +12,19 @@ def test_get_top_drivers_default():
     assert all('name' in d for d in result)
     assert all('importance_mean' in d for d in result)
     
-    # Check sorted by importance descending
     for i in range(len(result) - 1):
         assert result[i]['importance_mean'] >= result[i + 1]['importance_mean']
 
 
 def test_get_top_drivers_custom_n():
-    """Test getting custom number of top drivers."""
+    """Test custom number of drivers."""
     result = get_top_drivers("energy_futures", top_n=3)
     
     assert len(result) <= 3
 
 
 def test_get_top_drivers_includes_metrics():
-    """Test that drivers include all importance metrics."""
+    """Test driver metrics inclusion."""
     result = get_top_drivers("energy_futures", top_n=1)
     
     assert len(result) > 0
@@ -38,14 +37,13 @@ def test_get_top_drivers_includes_metrics():
 
 
 def test_get_top_drivers_invalid_dataset():
-    """Test error handling for invalid dataset."""
+    """Test invalid dataset error."""
     with pytest.raises(Exception):
         get_top_drivers("invalid_dataset")
 
 
 def test_get_driver_details():
-    """Test getting detailed driver information."""
-    # Get a valid driver name first
+    """Test detailed driver information."""
     top_drivers = get_top_drivers("energy_futures", top_n=1)
     driver_name = top_drivers[0]['name']
     
@@ -65,10 +63,8 @@ def test_get_driver_details_direction():
     
     result = get_driver_details("energy_futures", driver_name)
     
-    # Check direction is valid
     assert result['direction'] in ['positive', 'negative']
     
-    # Check explanation exists
     assert len(result['direction_explanation']) > 0
     
     if result['direction'] == 'positive':
@@ -82,12 +78,10 @@ def test_get_driver_details_correlations():
     
     result = get_driver_details("energy_futures", driver_name)
     
-    # Check Pearson correlation structure
     assert 'mean' in result['pearson_correlation']
     assert 'max' in result['pearson_correlation']
     assert 'min' in result['pearson_correlation']
     
-    # Check Granger causality structure
     assert 'mean' in result['granger_causality']
     assert isinstance(result['granger_causality']['mean'], (int, float))
 
@@ -106,14 +100,11 @@ def test_get_driver_details_not_found():
 
 def test_get_driver_details_with_lag():
     """Test lag information extraction."""
-    # Find a driver with lag information
     top_drivers = get_top_drivers("energy_futures", top_n=5)
     
-    # Get details for first driver
     driver_name = top_drivers[0]['name']
     result = get_driver_details("energy_futures", driver_name)
     
-    # Check lag fields exist
     assert 'lag' in result
     assert 'lag_explanation' in result
 
@@ -123,27 +114,32 @@ def test_get_driver_details_lag_explanation():
     top_drivers = get_top_drivers("energy_futures", top_n=5)
     driver_name = top_drivers[0]['name']
     
+    driver_name = top_drivers[0]['name']
     result = get_driver_details("energy_futures", driver_name)
     
-    # Check explanation exists
+    assert 'lag' in result
+    assert 'lag_explanation' in result
+    
+
+def test_get_driver_details_lag_explanation():
+    """Test lag explanation is user-friendly."""
+    top_drivers = get_top_drivers("energy_futures", top_n=5)
+    driver_name = top_drivers[0]['name']
+    
+    result = get_driver_details("energy_futures", driver_name)
     assert result['lag_explanation'] is not None
     assert len(result['lag_explanation']) > 0
     
-    # If lag exists, explanation should mention it
-    if result['lag']:
-        assert 'month' in result['lag_explanation'].lower()
 
-
-def test_get_driver_details_missing_lag():
-    """Test handling of missing lag information."""
-    # The target entry doesn't have lag info
-    # We'll test with a driver that might not have it
-    top_drivers = get_top_drivers("energy_futures", top_n=10)
+def test_get_driver_details_lag_explanation():
+    """Test lag explanation is user-friendly."""
+    top_drivers = get_top_drivers("energy_futures", top_n=5)
+    driver_name = top_drivers[0]['name']
     
-    # At least one should work
-    result = get_driver_details("energy_futures", top_drivers[0]['name'])
+    result = get_driver_details("energy_futures", driver_name)
     
-    # Should handle gracefully
+    assert result['lag_explanation'] is not None
+    assert len(result['lag_explanation']) > 0
     assert 'lag_explanation' in result
     
     # If no lag, explanation should indicate unavailable

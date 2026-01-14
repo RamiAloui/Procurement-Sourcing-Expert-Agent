@@ -28,7 +28,7 @@ class DataLoader:
         
         Returns DataFrame with Period and Value columns.
         """
-        # Check cache first
+        # Check cache
         cache_key = f"{dataset_name}_historical"
         if cache_key in self._cache:
             logger.info(f"Loading {dataset_name} historical data from cache")
@@ -39,11 +39,9 @@ class DataLoader:
             logger.warning(f"Dataset '{dataset_name}' not found in mapping")
             return None
         
-        # Build file path
         dataset_folder = DATASET_MAPPING[dataset_name]
         csv_path = self.data_path / dataset_folder / "historical_data.csv"
         
-        # Check file exists
         if not csv_path.exists():
             logger.warning(f"Historical data file not found: {csv_path}")
             return None
@@ -62,7 +60,6 @@ class DataLoader:
                 f"CSV file {csv_path} missing required columns: {missing_columns}"
             )
         
-        # Cache and return
         self._cache[cache_key] = df
         logger.info(f"Loaded {dataset_name} historical data: {len(df)} records")
         return df
@@ -72,7 +69,7 @@ class DataLoader:
         
         Returns ForecastData with forecast_series and quantile_forecast.
         """
-        # Check cache first
+        # Check cache
         cache_key = f"{dataset_name}_forecast"
         if cache_key in self._cache:
             logger.info(f"Loading {dataset_name} forecast data from cache")
@@ -83,11 +80,10 @@ class DataLoader:
             logger.warning(f"Dataset '{dataset_name}' not found in mapping")
             return None
         
-        # Build file path
+        # File path
         dataset_folder = DATASET_MAPPING[dataset_name]
         json_path = self.data_path / dataset_folder / "forecast.json"
         
-        # Check file exists
         if not json_path.exists():
             logger.warning(f"Forecast data file not found: {json_path}")
             return None
@@ -101,13 +97,12 @@ class DataLoader:
         except Exception as e:
             raise DataLoadError(f"Failed to read JSON file {json_path}: {e}")
         
-        # Validate structure
         if "forecast_series" not in data:
             raise DataLoadError(
                 f"JSON file {json_path} missing required field: forecast_series"
             )
         
-        # Transform forecast_series dict into lists for ForecastData
+        # Transforming forecast_series dict into lists for ForecastData
         forecast_series_dict = data["forecast_series"]
         dates = sorted(forecast_series_dict.keys())
         
@@ -122,13 +117,13 @@ class DataLoader:
                     quantile_forecast[quantile] = []
                 quantile_forecast[quantile].append(value)
         
-        # Validate 0.5 quantile exists
+        
         if "0.5" not in quantile_forecast:
             raise DataLoadError(
                 f"JSON file {json_path} missing required '0.5' quantile (point forecast)"
             )
         
-        # Create ForecastData instance
+        # ForecastData instance
         try:
             forecast_data = ForecastData(
                 forecast_series=dates,
@@ -142,7 +137,6 @@ class DataLoader:
         except (ValueError, TypeError) as e:
             raise DataLoadError(f"Invalid forecast data structure: {e}")
         
-        # Cache and return
         self._cache[cache_key] = forecast_data
         logger.info(f"Loaded {dataset_name} forecast data: {len(forecast_data.forecast_series)} periods")
         return forecast_data
@@ -177,7 +171,7 @@ class DataLoader:
         
         Returns list of DriverData sorted by importance (descending).
         """
-        # Use raw load_drivers method
+        # raw load_drivers method
         data = self.load_drivers(dataset_name)
         
         # Check cache first
@@ -186,7 +180,7 @@ class DataLoader:
             logger.info(f"Loading {dataset_name} driver data from cache")
             return self._cache[cache_key]
         
-        # Parse drivers (skip target_ entries)
+        # Parse drivers (to skip target_ entries)
         drivers = []
         for driver_id, driver_info in data.items():
             if driver_id.startswith('target_'):
@@ -195,23 +189,20 @@ class DataLoader:
             # Extract required fields with defaults
             driver_name = driver_info.get('driver_name', 'Unknown')
             
-            # Importance scores
             importance = driver_info.get('importance', {}).get('overall', {})
             importance_score = importance.get('mean', 0.0)
             importance_max = importance.get('max', 0.0)
             importance_min = importance.get('min', 0.0)
             
-            # Direction
             direction_val = driver_info.get('direction', {}).get('overall', {}).get('mean', 1)
             if direction_val is None:
                 direction_val = 1
             direction = 'positive' if direction_val >= 0 else 'negative'
             
-            # Correlations (optional)
             pearson = driver_info.get('pearson_correlation', {}).get('overall', {}).get('mean')
             granger = driver_info.get('granger_correlation', {}).get('overall', {}).get('mean')
             
-            # Lag (optional)
+            # Lag 
             lag_str = driver_info.get('overall_lag', '')
             lag_periods = None
             if lag_str and 'month' in lag_str:
@@ -220,12 +211,11 @@ class DataLoader:
                 if match:
                     lag_periods = int(match.group(1))
             
-            # Normalized series (optional)
             normalized_series = driver_info.get('normalized_series')
             if normalized_series:
                 normalized_series = list(normalized_series.values())
             
-            # Create DriverData instance
+            # DriverData instance
             try:
                 driver_data = DriverData(
                     driver_name=driver_name,
@@ -240,14 +230,11 @@ class DataLoader:
                 )
                 drivers.append(driver_data)
             except (ValueError, TypeError) as e:
-                # Skip invalid drivers, log warning
                 logger.warning(f"Skipping invalid driver {driver_id}: {e}")
                 continue
         
-        # Sort by importance descending
         drivers.sort(key=lambda d: d.importance_score, reverse=True)
         
-        # Cache and return
         self._cache[cache_key] = drivers
         logger.info(f"Loaded {dataset_name} driver data: {len(drivers)} drivers")
         return drivers

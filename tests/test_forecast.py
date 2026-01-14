@@ -22,7 +22,7 @@ def test_get_forecast():
 
 
 def test_get_forecast_multiple_months():
-    """Test getting forecast for different months ahead."""
+    """Test different month forecasts."""
     result_1 = get_forecast("energy_futures", months_ahead=1)
     result_3 = get_forecast("energy_futures", months_ahead=3)
     
@@ -30,7 +30,7 @@ def test_get_forecast_multiple_months():
 
 
 def test_get_forecast_by_date_valid():
-    """Test getting forecast for valid date."""
+    """Test forecast for valid date."""
     # First get a valid forecast date
     all_forecasts = get_all_forecasts("energy_futures")
     valid_date = all_forecasts[0]['date']
@@ -42,7 +42,7 @@ def test_get_forecast_by_date_valid():
 
 
 def test_get_forecast_by_date_invalid():
-    """Test error for date not in forecast horizon."""
+    """Test error for invalid date."""
     result = get_forecast_by_date("energy_futures", "2099-01-01")
     
     assert isinstance(result, dict)

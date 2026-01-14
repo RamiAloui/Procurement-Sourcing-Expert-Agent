@@ -30,7 +30,7 @@ def get_forecast(
     
     max_horizon = len(forecast_data.forecast_series)
     
-    # Validate forecast horizon
+    # Validataion of forecast horizon
     if months_ahead < 1 or months_ahead > max_horizon:
         return {
             'success': False,
@@ -45,7 +45,7 @@ def get_forecast(
             ]
         }
     
-    # Forecasts are 0-indexed, so months_ahead=1 is index 0
+    # Note : Forecasts are 0-indexed, so months_ahead=1 is index 0
     date = forecast_data.forecast_series[months_ahead - 1]
     value = forecast_data.quantile_forecast["0.5"][months_ahead - 1]
     
@@ -120,11 +120,11 @@ def get_forecast_by_date(
             ]
         }
     
-    # Get available forecast date range
+    # Available forecast date range
     min_forecast_date = forecast_data.forecast_series[0]
     max_forecast_date = forecast_data.forecast_series[-1]
     
-    # Check if date is out of forecast range
+    # Checking if date is out of forecast range
     if date < min_forecast_date or date > max_forecast_date:
         return {
             'success': False,
@@ -133,7 +133,7 @@ def get_forecast_by_date(
             'available_range': {'start': min_forecast_date, 'end': max_forecast_date}
         }
     
-    # Find matching date in forecast series
+    # Matching date in forecast series
     try:
         index = forecast_data.forecast_series.index(date)
         value = forecast_data.quantile_forecast["0.5"][index]
@@ -180,7 +180,6 @@ def get_quantile_forecast(
     forecast_data = loader.load_forecast(dataset_name)
     
     # Convert quantile to string key
-    # Check if dataset was found
     if forecast_data is None:
         return {
             'success': False,
@@ -226,7 +225,7 @@ def get_confidence_interval(
     data_path: str = "Agents - Code Challenge/Data"
 ) -> Dict:
     """Get confidence interval for a forecast."""
-    # Map confidence levels to quantile pairs (using available quantiles)
+    # Map confidence levels to quantile pairs
     quantile_map = {
         80: (0.15, 0.85),  # 80% confidence interval
         90: (0.05, 0.95)   # 90% confidence interval
@@ -242,7 +241,7 @@ def get_confidence_interval(
     
     lower_q, upper_q = quantile_map[confidence_level]
     
-    # Get lower bound, upper bound, and median
+    # Lower bound, upper bound, and median
     lower = get_quantile_forecast(dataset_name, date, lower_q, data_path)
     upper = get_quantile_forecast(dataset_name, date, upper_q, data_path)
     median = get_quantile_forecast(dataset_name, date, 0.5, data_path)
@@ -261,13 +260,12 @@ def compare_current_to_forecast(
     data_path: str = "Agents - Code Challenge/Data"
 ) -> Dict:
     """Compare current price with next forecast."""
-    # Get latest historical value
+    # Latest historical value
     current = get_latest_value(dataset_name, data_path)
     
-    # Get next forecast (1 month ahead)
+    # Next forecast (1 month ahead)
     forecast = get_forecast(dataset_name, months_ahead=1, data_path=data_path)
     
-    # Calculate difference and percentage change
     current_value = current['value']
     forecast_value = forecast['forecast_value']
     
@@ -328,7 +326,6 @@ def analyze_forecast_trend(
             'max_horizon': max_horizon
         }
     
-    # Get forecast values for the period (0.5 quantile = point forecast)
     forecast_values = forecast_data.quantile_forecast["0.5"][:months_ahead]
     forecast_dates = forecast_data.forecast_series[:months_ahead]
     
@@ -343,7 +340,7 @@ def analyze_forecast_trend(
     # Calculate average change
     avg_change = round(sum(pct_changes) / len(pct_changes), 2)
     
-    # Determine overall trend
+    # Overall trend
     if avg_change > 0:
         trend = "increasing"
     elif avg_change < 0:

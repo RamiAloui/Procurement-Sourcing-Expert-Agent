@@ -1,37 +1,31 @@
-"""
-Test suite to verify all required dependencies are installed and importable.
-"""
+"""Test required dependencies are installed."""
 import pytest
 from pathlib import Path
 
 
 def test_langchain_imports():
-    """Test that LangChain core packages can be imported and functional."""
+    """Test LangChain imports."""
     import langchain
     import langchain_core
     from langchain_core.messages import HumanMessage
     
-    # Verify imports successful
     assert langchain is not None
     assert langchain_core is not None
     
-    # Verify basic functionality
     msg = HumanMessage(content="test")
     assert msg.content == "test"
     assert msg.type == "human"
 
 
 def test_langgraph_imports():
-    """Test that LangGraph packages can be imported and functional."""
+    """Test LangGraph imports."""
     from langgraph.graph import StateGraph
     from langgraph.prebuilt import create_react_agent
     from typing import TypedDict
     
-    # Verify imports successful
     assert StateGraph is not None
     assert create_react_agent is not None
     
-    # Verify basic functionality - can create a state graph
     class TestState(TypedDict):
         value: int
     
@@ -40,7 +34,7 @@ def test_langgraph_imports():
 
 
 def test_langsmith_import():
-    """Test that LangSmith can be imported and has required functionality."""
+    """Test LangSmith import."""
     import langsmith
     from langsmith import Client
     
@@ -49,42 +43,37 @@ def test_langsmith_import():
 
 
 def test_langchain_ollama_import():
-    """Test that LangChain Ollama integration can be imported."""
+    """Test LangChain Ollama import."""
     from langchain_ollama import ChatOllama
     
     assert ChatOllama is not None
-    # Verify it's a callable class
     assert callable(ChatOllama)
 
 
 def test_pandas_import():
-    """Test that pandas can be imported and functional."""
+    """Test pandas import."""
     import pandas as pd
     import numpy as np
     
-    # Verify import successful
     assert pd is not None
     
-    # Verify basic functionality
     df = pd.DataFrame({'a': [1, 2, 3], 'b': [4, 5, 6]})
     assert len(df) == 3
     assert list(df.columns) == ['a', 'b']
 
 
 def test_streamlit_import():
-    """Test that Streamlit can be imported with chat components."""
+    """Test Streamlit import."""
     import streamlit as st
     
-    # Verify import successful
     assert st is not None
     
-    # Verify chat components exist
     assert hasattr(st, 'chat_message')
     assert hasattr(st, 'chat_input')
 
 
 def test_pytest_import():
-    """Test that pytest is available and functional."""
+    """Test pytest import."""
     import pytest
     
     assert pytest is not None

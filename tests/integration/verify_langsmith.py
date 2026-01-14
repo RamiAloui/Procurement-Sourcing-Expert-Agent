@@ -13,7 +13,7 @@ def test_langsmith_tracing():
     
     print(f"Response: {response.content}")
     print()
-    print("✓ LLM call completed successfully")
+    print("[PASS] LLM call completed successfully")
     print()
     print("Next steps:")
     print("1. Visit https://smith.langchain.com/")

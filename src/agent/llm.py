@@ -9,7 +9,7 @@ def get_llm():
     """Initialize and return configured ChatOllama instance."""
     return ChatOllama(
         base_url=os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434'),
-        model=os.getenv('OLLAMA_MODEL', 'qwen3:8b'),  # qwen3:8b recommended for better reasoning
+        model=os.getenv('OLLAMA_MODEL', 'qwen3:8b'), 
         temperature=float(os.getenv('OLLAMA_TEMPERATURE', '0.7'))
     )
 
@@ -18,7 +18,7 @@ def validate_ollama_connection():
     """Check if Ollama is running and accessible."""
     try:
         llm = get_llm()
-        # Simple test invocation
+        # test 
         llm.invoke("test")
         return True
     except Exception as e:

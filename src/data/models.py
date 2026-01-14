@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 
 
-# Custom exceptions for data loading errors
+# exceptions for data loading errors
 
 class DatasetNotFoundError(Exception):
     """Raised when dataset name is invalid."""
@@ -25,7 +25,7 @@ class DataLoadError(Exception):
     pass
 
 
-# Dataset mapping - maps friendly names to actual folder names
+# Dataset mapping
 DATASET_MAPPING = {
     "energy_futures": "#1181-Dataset_Germany Energy Futures, Settlement Price",
     "cotton_price": "#1597-Dataset_Pima Cotton Price",
@@ -62,11 +62,11 @@ class ForecastData:
     metadata: Optional[Dict[str, Any]] = None
     
     def __post_init__(self):
-        # Make sure we have data
+        # verifying data
         if not self.forecast_series:
             raise ValueError("forecast_series cannot be empty")
         
-        # Check date formats
+        
         for date_str in self.forecast_series:
             try:
                 datetime.strptime(date_str, "%Y-%m-%d")
@@ -76,7 +76,7 @@ class ForecastData:
                     f"Expected YYYY-MM-DD"
                 )
         
-        # Need median quantile at minimum
+        
         if "0.5" not in self.quantile_forecast:
             raise ValueError(
                 "quantile_forecast must include '0.5' (median) quantile"
@@ -106,7 +106,7 @@ class DriverData:
     normalized_series: Optional[List[float]] = None
     
     def __post_init__(self):
-        # Check scores are numeric
+        # Checking if scores are numeric
         for score_name, score_value in [
             ("importance_score", self.importance_score),
             ("importance_max", self.importance_max),
@@ -118,14 +118,14 @@ class DriverData:
                     f"Expected numeric"
                 )
         
-        # Check score range makes sense
+        # Score range 
         if not (self.importance_min <= self.importance_score <= self.importance_max):
             raise ValueError(
                 f"Importance score {self.importance_score} is outside valid range "
                 f"[{self.importance_min}, {self.importance_max}]"
             )
         
-        # Direction must be positive or negative
+        # Direction positive/negative
         if self.direction not in ("positive", "negative"):
             raise ValueError(
                 f"Invalid direction: {self.direction}. "

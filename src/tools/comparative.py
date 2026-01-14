@@ -22,10 +22,8 @@ def compare_datasets(
     for name in dataset_names[1:]:
         common_dates = common_dates.intersection(set(dfs[name]['Period']))
     
-    # Sort dates for consistent output
     common_dates = sorted(common_dates)
     
-    # Build aligned data
     aligned_data = []
     for date in common_dates:
         record = {'date': date}
@@ -35,7 +33,7 @@ def compare_datasets(
             record[name] = float(value)
         aligned_data.append(record)
     
-    # Build result
+    # Result
     result = {
         'datasets': dataset_names,
         'common_date_range': {
@@ -55,13 +53,13 @@ def calculate_correlation(
     data_path: str = "Agents - Code Challenge/Data"
 ) -> Dict:
     """Calculate correlation between two datasets."""
-    # Get aligned data using compare_datasets
+    # Getting aligned data using compare_datasets
     aligned_data = compare_datasets([dataset1_name, dataset2_name], data_path)
     
     # Convert to DataFrame for correlation calculation
     df = pd.DataFrame(aligned_data['aligned_data'])
     
-    # Calculate Pearson correlation
+    # Pearson correlation
     correlation = df[dataset1_name].corr(df[dataset2_name])
     
     # Determine direction
@@ -108,14 +106,14 @@ def analyze_timing_relationships(
     """Analyze timing relationships between two datasets using driver lag data."""
     loader = DataLoader(data_path)
     
-    # Load driver data for both datasets
+    # Loading driver data for both datasets
     drivers1 = loader.load_drivers(dataset1_name)
     drivers2 = loader.load_drivers(dataset2_name)
     
     # Find common drivers
     common_drivers = list(set(drivers1.keys()).intersection(set(drivers2.keys())))
     
-    # Analyze lag for each common driver
+    # Analyzing lag for each common driver
     timing_insights = []
     lag_differences = []
     
@@ -123,7 +121,7 @@ def analyze_timing_relationships(
         lag1 = drivers1[driver].get('lag', 0)
         lag2 = drivers2[driver].get('lag', 0)
         
-        # Handle None values
+       
         if lag1 is None:
             lag1 = 0
         if lag2 is None:
@@ -132,7 +130,7 @@ def analyze_timing_relationships(
         lag_diff = lag1 - lag2
         lag_differences.append(abs(lag_diff))
         
-        # Generate interpretation
+        # Interpretation
         if lag1 < lag2:
             interpretation = f"{dataset1_name} responds after {lag1} months, {dataset2_name} follows after {lag2} months"
         elif lag2 < lag1:
@@ -147,10 +145,10 @@ def analyze_timing_relationships(
             'interpretation': interpretation
         })
     
-    # Calculate average lag difference
+    # Average lag difference
     avg_lag_diff = sum(lag_differences) / len(lag_differences) if lag_differences else 0
     
-    # Determine lead commodity
+    # Lead commodity
     dataset1_avg_lag = sum(drivers1[d].get('lag', 0) or 0 for d in common_drivers) / len(common_drivers) if common_drivers else 0
     dataset2_avg_lag = sum(drivers2[d].get('lag', 0) or 0 for d in common_drivers) / len(common_drivers) if common_drivers else 0
     
@@ -195,10 +193,9 @@ def analyze_multi_commodity_strategy(
     all_drivers = {}
     
     for dataset in dataset_names:
-        # Get latest value
+
         latest = get_latest_value(dataset, data_path)
         
-        # Get top drivers
         drivers = get_top_drivers(dataset, top_n=5, data_path=data_path)
         driver_names = [d['name'] for d in drivers]
         all_drivers[dataset] = set(driver_names)
@@ -209,7 +206,6 @@ def analyze_multi_commodity_strategy(
         }
     
     # Cross-commodity insights
-    # Find shared drivers
     if len(dataset_names) >= 2:
         shared_drivers = set.intersection(*all_drivers.values())
     else:
@@ -219,7 +215,7 @@ def analyze_multi_commodity_strategy(
         'shared_drivers': list(shared_drivers)
     }
     
-    # Generate strategic recommendations
+    # Recommendations
     recommendations = []
     
     # Recommendation based on shared drivers

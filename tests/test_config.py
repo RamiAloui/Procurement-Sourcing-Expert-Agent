@@ -1,8 +1,4 @@
-"""
-Tests for configuration module.
-
-Tests configuration loading from environment variables with fallback defaults.
-"""
+"""Tests for configuration module."""
 
 import os
 import pytest
@@ -10,13 +6,13 @@ from pathlib import Path
 
 
 def test_config_module_imports():
-    """Test that config module can be imported."""
+    """Test config module import."""
     from src import config
     assert config is not None
 
 
 def test_ollama_configuration_defaults():
-    """Test OLLAMA configuration has valid default values."""
+    """Test OLLAMA default values."""
     from src.config import OLLAMA_BASE_URL, OLLAMA_MODEL
     
     assert OLLAMA_BASE_URL == "http://localhost:11434"
@@ -24,7 +20,7 @@ def test_ollama_configuration_defaults():
 
 
 def test_langsmith_configuration_defaults():
-    """Test LangSmith configuration has valid default values."""
+    """Test LangSmith default values."""
     from src.config import LANGCHAIN_TRACING_V2, LANGCHAIN_API_KEY, LANGCHAIN_PROJECT
     
     assert LANGCHAIN_TRACING_V2 == "true"
@@ -51,7 +47,7 @@ def test_data_path_exists():
 
 
 def test_config_summary_function():
-    """Test get_config_summary returns expected structure."""
+    """Test config summary structure."""
     from src.config import get_config_summary
     
     summary = get_config_summary()
@@ -66,7 +62,7 @@ def test_config_summary_function():
 
 
 def test_config_summary_masks_api_key():
-    """Test get_config_summary masks API key for security."""
+    """Test API key masking in summary."""
     from src.config import get_config_summary
     
     summary = get_config_summary()
@@ -76,7 +72,7 @@ def test_config_summary_masks_api_key():
 
 
 def test_config_respects_environment_variables(monkeypatch):
-    """Test configuration respects environment variables when set."""
+    """Test environment variable override."""
     # Set environment variables before importing config
     monkeypatch.setenv("OLLAMA_MODEL", "llama3.1")
     monkeypatch.setenv("LANGCHAIN_PROJECT", "test-project")
@@ -96,7 +92,7 @@ def test_config_respects_environment_variables(monkeypatch):
 
 
 def test_invalid_data_path_raises_error(monkeypatch, tmp_path):
-    """Test that invalid DATA_PATH raises ValueError."""
+    """Test invalid DATA_PATH error handling."""
     # Set DATA_PATH to non-existent directory
     invalid_path = tmp_path / "nonexistent"
     monkeypatch.setenv("DATA_PATH", str(invalid_path))

@@ -10,10 +10,10 @@ from src.data.models import DatasetNotFoundError, DataLoadError, ForecastData, D
 
 
 class TestDataLoader:
-    """Test suite for DataLoader class."""
+    """Test DataLoader class."""
 
     def test_load_historical_success(self, data_loader):
-        """Test successful historical data loading."""
+        """Test historical data loading."""
         df = data_loader.load_historical("energy_futures")
         
         assert isinstance(df, pd.DataFrame)
@@ -22,7 +22,7 @@ class TestDataLoader:
         assert len(df) > 0
 
     def test_load_historical_all_datasets(self, data_loader):
-        """Test loading all 3 datasets successfully."""
+        """Test loading all datasets."""
         for dataset_name in ["energy_futures", "cotton_price", "cotton_export"]:
             df = data_loader.load_historical(dataset_name)
             assert len(df) > 0
@@ -30,23 +30,19 @@ class TestDataLoader:
             assert "Value" in df.columns
 
     def test_load_historical_caching(self, data_loader):
-        """Test that second call uses cache, not file I/O."""
+        """Test caching behavior."""
         with patch('pandas.read_csv') as mock_read_csv:
-            # Set up mock to return a DataFrame
             mock_read_csv.return_value = pd.DataFrame({
                 "Period": ["2024-01-01"],
                 "Value": [100.0]
             })
             
-            # First call - should read file
             df1 = data_loader.load_historical("energy_futures")
             assert mock_read_csv.call_count == 1
             
-            # Second call - should use cache
             df2 = data_loader.load_historical("energy_futures")
-            assert mock_read_csv.call_count == 1  # Still 1, not 2
+            assert mock_read_csv.call_count == 1
             
-            # Verify same DataFrame returned
             assert df1 is df2
 
     def test_load_historical_invalid_dataset(self, data_loader):
@@ -56,15 +52,13 @@ class TestDataLoader:
 
     def test_load_historical_missing_file(self, tmp_path):
         """Test error handling for missing CSV file."""
-        # Create loader with empty directory
         empty_loader = DataLoader(tmp_path)
         
         result = empty_loader.load_historical("energy_futures")
         assert result is None
 
     def test_load_historical_invalid_csv_structure(self, tmp_path):
-        """Test error handling for CSV with missing columns."""
-        # Create CSV with wrong columns
+        """Test CSV with missing columns."""
         bad_csv_dir = tmp_path / "#1181-Dataset_Germany Energy Futures, Settlement Price"
         bad_csv_dir.mkdir(parents=True)
         csv_file = bad_csv_dir / "historical_data.csv"

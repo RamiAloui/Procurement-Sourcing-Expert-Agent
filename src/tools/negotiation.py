@@ -11,7 +11,7 @@ def generate_negotiation_talking_points(
     months_ahead: int = 3,
     data_path: str = "Agents - Code Challenge/Data"
 ) -> Dict:
-    """Generate negotiation talking points with data citations."""
+    """Negotiation talking points with data citations."""
     current = get_latest_value(dataset_name, data_path)
     forecast = get_forecast(dataset_name, months_ahead, data_path)
     drivers = get_top_drivers(dataset_name, top_n=5, data_path=data_path)
@@ -21,14 +21,14 @@ def generate_negotiation_talking_points(
     
     talking_points = []
     
-    # Point 1: Current market price
+    # Current market price
     talking_points.append({
         'point': f"Current market price is ${current['value']:.2f} as of {current['date']}",
         'type': 'fact',
         'citation': f"Historical data: {dataset_name}"
     })
     
-    # Point 2: Forecast trend
+    # Forecast trend
     if pct_change > 0:
         talking_points.append({
             'point': f"Forecast shows {pct_change:.1f}% increase to ${forecast['forecast_value']:.2f} by {forecast['date']}",
@@ -42,7 +42,7 @@ def generate_negotiation_talking_points(
             'citation': f"Forecast data: {dataset_name}"
         })
     
-    # Point 3-5: Top drivers with direction details
+    # Top drivers with direction details
     for driver in drivers[:3]:
         try:
             driver_detail = get_driver_details(dataset_name, driver['name'], data_path)
@@ -54,7 +54,7 @@ def generate_negotiation_talking_points(
                 'citation': f"Driver analysis: {dataset_name}"
             })
         except (ValueError, KeyError):
-            # If driver details not available, skip this driver
+            # If driver details not availabl skip this driver
             continue
     
     return {
@@ -79,11 +79,11 @@ def validate_supplier_claim(
     current = get_latest_value(dataset_name, data_path)
     forecast_data = get_forecast_with_quantiles(dataset_name, months_ahead, data_path)
     
-    # Get median (always 0.5)
+    # Median
     forecast_median = forecast_data['quantile_0.5']
     
-    # Get low/high quantiles - different datasets have different quantiles available
-    # Try 0.1/0.9 first, fall back to 0.05/0.95 or 0.15/0.85
+    # Low/high quantiles
+    # 0.1/0.9 first and fall back
     forecast_low = (forecast_data.get('quantile_0.1') or 
                    forecast_data.get('quantile_0.05') or 
                    forecast_data.get('quantile_0.15'))
@@ -139,7 +139,7 @@ def identify_driver_arguments(
     contradicting = []
     
     for driver in drivers:
-        # Get driver details to determine direction
+        # Driver details to determine direction
         try:
             driver_detail = get_driver_details(dataset_name, driver['name'], data_path)
             is_positive = driver_detail.get('direction', 'neutral') == 'positive'
@@ -149,7 +149,7 @@ def identify_driver_arguments(
                     supporting.append(driver)
                 else:
                     contradicting.append(driver)
-            else:  # decrease
+            else: 
                 if is_positive:
                     contradicting.append(driver)
                 else:

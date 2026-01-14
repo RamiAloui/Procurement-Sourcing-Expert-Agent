@@ -1,8 +1,6 @@
 """
-Configuration management for Agents - Code Challenge.
+Configuration management
 
-Loads configuration from environment variables with fallback defaults.
-Uses python-dotenv to load .env file if present.
 """
 
 import os
